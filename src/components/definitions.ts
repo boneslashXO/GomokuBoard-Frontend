@@ -1,3 +1,5 @@
+//here lies all the definitions (enums / consts / props, etc.)
+
 export enum STONE_COLOR {
   black = "black",
   white = "white",
