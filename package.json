@@ -1,10 +1,11 @@
 {
   "name": "package.json",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "lint": "eslint . --ext .ts,.js,.vue",
+    "dev": "npm run lint && vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
@@ -17,7 +18,7 @@
     "@typescript-eslint/parser": "^7.0.2",
     "@vitejs/plugin-vue": "^5.0.4",
     "eslint": "^8.56.0",
-    "eslint-plugin-vue": "^9.21.1",
+    "eslint-plugin-vue": "^9.22.0",
     "prettier": "3.2.5",
     "typescript": "^5.2.2",
     "vite": "^5.1.4",

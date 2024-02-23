@@ -5,14 +5,14 @@ import { BORDER_STYLE, IBorderProps } from "../../definitions";
 const props = defineProps<IBorderProps>();
 
 const sizeX2 = computed(() =>
-  props.borderStyle == BORDER_STYLE.right ? props.size : 0,
+  props.borderStyle == BORDER_STYLE.right ? props.size : 0
 );
 
 const sizeY2 = computed(() =>
-  props.borderStyle == BORDER_STYLE.down ? props.size : 0,
+  props.borderStyle == BORDER_STYLE.down ? props.size : 0
 );
 </script>
-
+<!-- using the svg and line for higher details for the line used -->
 <template>
   <svg :height="props.size" :width="props.size" pointer-events="none">
     <line
