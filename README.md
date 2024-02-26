@@ -1,6 +1,6 @@
 # Gomoku board project
 
-Hello welcome, this is gomoku board project - based on using Vue.js on frontend and on the backend who knows what, we will see. ChatGPT is used as well to make everything faster.
+Hello welcome, this is gomoku board project -frontend based on using Vue.js which is sending the messages to other project and receives them - TODO. ChatGPT is used as well to make everything faster.
 
 # Purpose
 
