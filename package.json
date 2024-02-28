@@ -10,10 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "phoenix": "^1.7.11",
     "pinia": "^2.1.7",
     "vue": "^3.4.19"
   },
   "devDependencies": {
+    "@types/phoenix": "^1.6.4",
     "@typescript-eslint/eslint-plugin": "^7.0.2",
     "@typescript-eslint/parser": "^7.0.2",
     "@vitejs/plugin-vue": "^5.0.4",

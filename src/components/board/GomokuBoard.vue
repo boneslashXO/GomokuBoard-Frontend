@@ -1,11 +1,41 @@
 <script setup lang="ts">
 import CellBoard from "./cell/CellBoard.vue";
 import { useGomokuBoardStore } from "../../stores/gomokuBoardStore.ts";
+import { onMounted, ref } from 'vue';
+import { Socket } from 'phoenix';
 import { computed } from "vue";
+
+
+const engineOutput = ref<string>('');
 
 const gomokuBoardStore = useGomokuBoardStore();
 
 const gomokuBoard = computed(() => gomokuBoardStore.gomokuBoard);
+
+const socket = new Socket("ws://localhost:4000/socket", {});
+socket.connect();
+const channel = socket.channel('AIgame:lobby', {});
+
+
+onMounted( () => {
+  channel.join()
+    .receive('ok', () => console.log('Successfully joined the AI game lobby'))
+    .receive('error', (resp) => console.error('Unable to join the AI game lobby', resp));
+  console.log(channel);
+
+     // Listen for messages on the "engine_output" event
+  channel.on('engine_output', (response) => {
+    console.log(response);
+    engineOutput.value = response.output;
+  });
+
+})
+
+function startGame() {
+  channel.push("start_game", {})
+    .receive("ok", response => console.log("Game start success:", response))
+    .receive("error", response => console.log("Game start failed:", response));
+}
 
 //function for getting the exact position of the mouse on screen
 function getThePositionOfTheMouse(event: MouseEvent) {
@@ -70,6 +100,13 @@ function removeLastStone(event: MouseEvent) {
       :number="cellBoard.number"
     ></CellBoard>
   </svg>
+
+<button 
+    style="width: 100px; height: 100px;"
+    @click="startGame" 
+    v-text="'Prdelllll'"
+  ></button>
+
 </template>
 
 <style scoped></style>
