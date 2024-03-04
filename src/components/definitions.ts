@@ -5,6 +5,10 @@ export enum STONE_COLOR {
   white = "white",
 }
 
+export enum COMMAND_TYPE {
+  start = "start_game"
+}
+
 export enum BORDER_STYLE {
   right = "right",
   down = "down",

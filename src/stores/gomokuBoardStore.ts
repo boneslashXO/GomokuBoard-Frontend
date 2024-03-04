@@ -52,5 +52,11 @@ export const useGomokuBoardStore = defineStore("board", {
         this.numberOfMoves--;
       }
     },
+    updateBoardBasedOnEngineOutput(output: string) {
+    // Logic to update the board based on the engine's output
+    console.log("Updating board based on engine output:", output);
+    // Update state as necessary
   },
+  },
+  
 });

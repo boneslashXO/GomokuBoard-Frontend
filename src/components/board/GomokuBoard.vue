@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import CellBoard from "./cell/CellBoard.vue";
 import { useGomokuBoardStore } from "../../stores/gomokuBoardStore.ts";
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
+import { useEngineStore } from "../../stores/engineStore.ts";
+import { COMMAND_TYPE } from "../definitions.ts";
 
 const gomokuBoardStore = useGomokuBoardStore();
+const engineStore = useEngineStore();
 
 const gomokuBoard = computed(() => gomokuBoardStore.gomokuBoard);
+
+
+onMounted( () => {
+  engineStore.connectToSocket();
+})
 
 //function for getting the exact position of the mouse on screen
 function getThePositionOfTheMouse(event: MouseEvent) {
@@ -48,7 +56,6 @@ function removeLastStone(event: MouseEvent) {
     :width="gomokuBoardStore.totalSizeInPixels"
     :height="gomokuBoardStore.totalSizeInPixels"
     overflow="visible"
-    fill="grey"
     @mousedown.left="(ev) => addStone(ev)"
     @contextmenu="(ev) => removeLastStone(ev)"
   >
@@ -70,6 +77,13 @@ function removeLastStone(event: MouseEvent) {
       :number="cellBoard.number"
     ></CellBoard>
   </svg>
+
+<button 
+    style="width: 100px; height: 100px;"
+    v-text="'Start game'"
+    @click="engineStore.sendMessage(COMMAND_TYPE.start, undefined)"
+  ></button>
+
 </template>
 
 <style scoped></style>
