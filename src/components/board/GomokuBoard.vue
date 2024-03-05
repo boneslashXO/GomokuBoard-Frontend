@@ -80,9 +80,15 @@ function removeLastStone(event: MouseEvent) {
 
 <button 
     style="width: 100px; height: 100px;"
-    v-text="'Start game'"
-    @click="engineStore.sendMessage(COMMAND_TYPE.start, undefined)"
+    v-text="'Analyzing mode'"
+    @click="engineStore.sendMessage(COMMAND_TYPE.start, `START 15\n`)"
   ></button>
+
+  <!-- <button 
+    style="width: 100px; height: 100px;"
+    v-text="'Play something'"
+    @click="engineStore.sendMessage(COMMAND_TYPE.analyse, `BOARD\n10,10,1\n10,11,2\n11,11,1\n9,10,2\nDONE\n`)"
+  ></button> -->
 
 </template>
 

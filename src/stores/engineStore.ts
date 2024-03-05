@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { Socket, Channel } from 'phoenix';
 import { useGomokuBoardStore } from './gomokuBoardStore';
-import { COMMAND_TYPE } from '../components/definitions';
+import { COMMAND_TYPE, IEngineOutput } from '../components/definitions';
 
 export const useEngineStore = defineStore('engineStore', {
   state: () => ({
@@ -23,19 +23,18 @@ export const useEngineStore = defineStore('engineStore', {
         .receive('ok', () => console.log('Successfully joined the AI game lobby'))
         .receive('error', resp => console.error('Unable to join the AI game lobby', resp));
 
-      this.channel.on('engine_output', (response) => {
-        // Update `engineOutput` or directly communicate with `gomokuBoardStore`
-        this.engineOutput = response.output;
-        this.processEngineOutput(response.output);
+      this.channel.on('engine_output', (response : IEngineOutput) => {
+        console.log(response.commandType);
+        console.log(response.output);
       });
     },
-    sendMessage(commandType: COMMAND_TYPE, commandData: string | undefined) {
+    sendMessage(commandType: COMMAND_TYPE, commandData: string) {
       // Ensure `channel` is available and ready
       if (!this.channel) {
         console.error('Channel is not set up.');
         return;
       }
-      this.channel.push(commandType, commandData ? { payload: commandData } : {});
+      this.channel.push(commandType, { command: commandData });
     },
 
     // Example action to process engine output and interact with `gomokuBoardStore`
