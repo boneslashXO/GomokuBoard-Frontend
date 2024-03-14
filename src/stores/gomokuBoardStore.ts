@@ -14,6 +14,10 @@ export const useGomokuBoardStore = defineStore("board", {
     getCellByLastMove(state) {
       return state.gomokuBoard.find((x) => x.number == state.numberOfMoves);
     },
+    getCurrentPositionForAnalysis(state)
+    {
+      return state.gomokuBoard.filter(x=> x.number != undefined).sort((a , b) => a.number! - b.number!);
+    },
   },
   actions: {
     initializeBoard(boardSize: number, totalSizeInPixels: number) {
@@ -35,6 +39,9 @@ export const useGomokuBoardStore = defineStore("board", {
           cell.column === coordinations.y && cell.row === coordinations.x
       );
     },
+    getReversedColumn(columnIndex: number) {
+    return (this.boardSize - 1) - columnIndex;
+   },
     addMoveNumber(coordinations: { x: number; y: number } | undefined) {
       if (coordinations) {
         const cell = this.getCellByRowAndColumn(coordinations);
@@ -54,7 +61,7 @@ export const useGomokuBoardStore = defineStore("board", {
     },
     updateBoardBasedOnEngineOutput(output: string) {
     // Logic to update the board based on the engine's output
-    console.log("Updating board based on engine output:", output);
+      console.log("Updating board based on engine output:", output);
     // Update state as necessary
   },
   },

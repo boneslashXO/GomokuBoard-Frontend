@@ -10,8 +10,7 @@ const engineStore = useEngineStore();
 
 const gomokuBoard = computed(() => gomokuBoardStore.gomokuBoard);
 
-
-onMounted( () => {
+onMounted(() => {
   engineStore.connectToSocket();
 })
 
@@ -45,50 +44,51 @@ function removeLastStone(event: MouseEvent) {
   event.stopPropagation();
   event.preventDefault();
 }
+
+//analysation of the position with engine
+function analysePositionWithEngine() {
+  if (engineStore.isEngineOnline) {
+    let formattedMoves: string[] = [];
+
+    const boardPosition = gomokuBoardStore.getCurrentPositionForAnalysis;
+
+    boardPosition.forEach((move, index) => {
+
+      const currentPlayerMove = ((index + boardPosition.length) % 2) + 1;
+      const reversedColumn = gomokuBoardStore.getReversedColumn(move.column);
+
+      formattedMoves.push(`${move.row},${reversedColumn},${currentPlayerMove}`);
+    });
+
+    const analyzeCommand = `BOARD\n${formattedMoves.join('\n')}\nDONE\n`;
+
+    engineStore.sendMessage(COMMAND_TYPE.analyse, analyzeCommand);
+  }
+}
+
 </script>
 
 <!--Gomoku board uses the svg for good quality and and rect for the background
     and is made by the cells -> component Cellboard 
 -->
-
 <template>
-  <svg
-    :width="gomokuBoardStore.totalSizeInPixels"
-    :height="gomokuBoardStore.totalSizeInPixels"
-    overflow="visible"
-    @mousedown.left="(ev) => addStone(ev)"
-    @contextmenu="(ev) => removeLastStone(ev)"
-  >
-    <rect
-      :x="-gomokuBoardStore.cellSize / 2"
-      :y="-gomokuBoardStore.cellSize / 2"
+  <svg :width="gomokuBoardStore.totalSizeInPixels" :height="gomokuBoardStore.totalSizeInPixels" overflow="visible"
+    @mousedown.left="(ev) => addStone(ev)" @contextmenu="(ev) => removeLastStone(ev)">
+    <rect :x="-gomokuBoardStore.cellSize / 2" :y="-gomokuBoardStore.cellSize / 2"
       :width="gomokuBoardStore.totalSizeInPixels - gomokuBoardStore.cellSize"
-      :height="gomokuBoardStore.totalSizeInPixels - gomokuBoardStore.cellSize"
-      fill="grey"
-      pointer-events="none"
-    />
+      :height="gomokuBoardStore.totalSizeInPixels - gomokuBoardStore.cellSize" fill="grey" pointer-events="none" />
 
-    <CellBoard
-      v-for="(cellBoard, index) in gomokuBoard"
-      :key="index"
-      :row="cellBoard.row"
-      :column="cellBoard.column"
-      :size="cellBoard.size"
-      :number="cellBoard.number"
-    ></CellBoard>
+    <CellBoard v-for="(cellBoard, index) in gomokuBoard" :key="index" :row="cellBoard.row" :column="cellBoard.column"
+      :size="cellBoard.size" :number="cellBoard.number"></CellBoard>
   </svg>
 
-<button 
-    style="width: 100px; height: 100px;"
-    v-text="'Analyzing mode'"
-    @click="engineStore.sendMessage(COMMAND_TYPE.start, `START 15\n`)"
-  ></button>
+  <button style="width: 100px; height: 100px;" v-text="'Analyzing mode'"
+    @click="engineStore.sendMessage(COMMAND_TYPE.start, `info rule 1 START 15\n`)"></button>
 
-  <!-- <button 
-    style="width: 100px; height: 100px;"
-    v-text="'Play something'"
-    @click="engineStore.sendMessage(COMMAND_TYPE.analyse, `BOARD\n10,10,1\n10,11,2\n11,11,1\n9,10,2\nDONE\n`)"
-  ></button> -->
+  <button style="width: 100px; height: 100px;" v-text="'Play something'" @click="analysePositionWithEngine"></button>
+
+  <button style="width: 100px; height: 100px;" v-text="'Stop'"
+    @click="engineStore.sendMessage(COMMAND_TYPE.stop, `YXSTOP\n`)"></button>
 
 </template>
 

@@ -7,6 +7,7 @@ import { COMMAND_TYPE, IEngineOutput } from '../components/definitions';
 export const useEngineStore = defineStore('engineStore', {
   state: () => ({
     engineOutput: ref(''), // For demonstration, might hold last message or be used differently
+    isEngineOnline: ref<boolean>(false),
     socket: ref<Socket | null>(null), // Use ref to make socket reactive
     channel: ref<Channel | null>(null), // Use ref to make channel reactive
     // Other state properties as needed
@@ -24,8 +25,7 @@ export const useEngineStore = defineStore('engineStore', {
         .receive('error', resp => console.error('Unable to join the AI game lobby', resp));
 
       this.channel.on('engine_output', (response : IEngineOutput) => {
-        console.log(response.commandType);
-        console.log(response.output);
+        this.processEngineOutput(response);
       });
     },
     sendMessage(commandType: COMMAND_TYPE, commandData: string) {
@@ -38,9 +38,26 @@ export const useEngineStore = defineStore('engineStore', {
     },
 
     // Example action to process engine output and interact with `gomokuBoardStore`
-    processEngineOutput(output: string) {
-      // Directly use `gomokuBoardStore` to update UI based on engine output
-      useGomokuBoardStore().updateBoardBasedOnEngineOutput(output);
+    processEngineOutput(response : IEngineOutput) {
+      if(response.commandType == COMMAND_TYPE.start)
+      {
+        console.log(response.output);
+        if(response.output.includes("OK"))
+        {
+          this.isEngineOnline = true;
+        }
+      }
+     else if(response.commandType == COMMAND_TYPE.analyse)
+     {
+       // Directly use `gomokuBoardStore` to update UI based on engine output
+       useGomokuBoardStore().updateBoardBasedOnEngineOutput(response.output); 
+     }
+
+     else if(response.commandType == COMMAND_TYPE.stop)
+     {
+       console.log(response.output);
+     }
+
     },
      disconnect() {
       if (this.channel) {

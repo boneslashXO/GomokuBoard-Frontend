@@ -6,8 +6,9 @@ export enum STONE_COLOR {
 }
 
 export enum COMMAND_TYPE {
-  start = "start_game",
-  analyse = "analyze_position"
+  start = "start_ai",
+  analyse = "analyze_position",
+  stop = "stop_ai"
 }
 
 export enum BORDER_STYLE {
