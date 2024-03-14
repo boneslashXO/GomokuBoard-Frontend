@@ -6,7 +6,9 @@ export enum STONE_COLOR {
 }
 
 export enum COMMAND_TYPE {
-  start = "start_game"
+  start = "start_ai",
+  analyse = "analyze_position",
+  stop = "stop_ai"
 }
 
 export enum BORDER_STYLE {
@@ -31,4 +33,9 @@ export interface IStoneProps {
   size: number;
   number?: number;
   textFontSize: number;
+}
+
+export interface IEngineOutput {
+  output : string;
+  commandType: COMMAND_TYPE
 }
