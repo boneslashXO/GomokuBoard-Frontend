@@ -6,7 +6,7 @@ import { COMMAND_TYPE, IEngineOutput } from '../components/definitions';
 
 export const useEngineStore = defineStore('engineStore', {
   state: () => ({
-    engineOutput: ref(''), // For demonstration, might hold last message or be used differently
+    //engineOutput: ref(''), // For demonstration, might hold last message or be used differently
     isEngineOnline: ref<boolean>(false),
     socket: ref<Socket | null>(null), // Use ref to make socket reactive
     channel: ref<Channel | null>(null), // Use ref to make channel reactive
