@@ -8,6 +8,7 @@ export const useEngineStore = defineStore('engineStore', {
   state: () => ({
     //engineOutput: ref(''), // For demonstration, might hold last message or be used differently
     isEngineOnline: ref<boolean>(false),
+    evaluationScore: 10,
     socket: ref<Socket | null>(null), // Use ref to make socket reactive
     channel: ref<Channel | null>(null), // Use ref to make channel reactive
     // Other state properties as needed
@@ -55,10 +56,13 @@ export const useEngineStore = defineStore('engineStore', {
 
      else if(response.commandType == COMMAND_TYPE.stop)
      {
-       console.log(response.output);
+       useGomokuBoardStore().playCurrentlyBestMove();
      }
 
     },
+    updateEvaluationScore(newScore : number) {
+    this.evaluationScore = newScore;
+  },
      disconnect() {
       if (this.channel) {
         this.channel.leave(); // Leave the channel

@@ -9,15 +9,19 @@ export const useGomokuBoardStore = defineStore("board", {
     boardSize: 0,
     cellSize: 0,
     numberOfMoves: 0,
+    lastBestMoveCoords: { row: -1, column: -1 },
   }),
   getters: {
     getCellByLastMove(state) {
       return state.gomokuBoard.find((x) => x.number == state.numberOfMoves);
     },
-    getCurrentPositionForAnalysis(state)
-    {
-      return state.gomokuBoard.filter(x=> x.number != undefined).sort((a , b) => a.number! - b.number!);
+    getCurrentPositionForAnalysis(state) {
+      return state.gomokuBoard.filter(x => x.number != undefined).sort((a, b) => a.number! - b.number!);
     },
+    lastBestMove(state) {
+      // Return the last best move coordinates
+      return state.lastBestMoveCoords;
+    }
   },
   actions: {
     initializeBoard(boardSize: number, totalSizeInPixels: number) {
@@ -39,9 +43,9 @@ export const useGomokuBoardStore = defineStore("board", {
           cell.column === coordinations.y && cell.row === coordinations.x
       );
     },
-    getReversedColumn(columnIndex: number) {
-    return (this.boardSize - 1) - columnIndex;
-   },
+    getReversedIndex(index: number) {
+      return (this.boardSize - 1) - index;
+    },
     addMoveNumber(coordinations: { x: number; y: number } | undefined) {
       if (coordinations) {
         const cell = this.getCellByRowAndColumn(coordinations);
@@ -52,6 +56,9 @@ export const useGomokuBoardStore = defineStore("board", {
         }
       }
     },
+    updateLastBestMoveCoords(row: number, column: number) {
+      this.lastBestMoveCoords = { row, column };
+    },
     deleteLastMove() {
       const cell = this.getCellByLastMove;
       if (cell) {
@@ -59,11 +66,39 @@ export const useGomokuBoardStore = defineStore("board", {
         this.numberOfMoves--;
       }
     },
+    playCurrentlyBestMove() {
+      if (this.lastBestMove.column != -1 && this.lastBestMove.row != -1) {
+        this.addMoveNumber({ x: this.lastBestMove.row, y: this.lastBestMove.column })
+        this.updateLastBestMoveCoords(-1, -1);
+      }
+    },
     updateBoardBasedOnEngineOutput(output: string) {
-    // Logic to update the board based on the engine's output
-      console.log("Updating board based on engine output:", output);
-    // Update state as necessary
+
+      const outputSplitted = output.split("|");
+
+      const lastValue = outputSplitted[outputSplitted.length - 1];
+
+      const firstCoordinateMatch = lastValue.match(/\b([A-O])([0-9]|1[0-4])\b/);
+
+      if (firstCoordinateMatch) {
+        const [_fullMatch, columnLetter, rowString] = firstCoordinateMatch;
+
+        // Convert the column from 'A'-'O' to 0-14
+        const firstIndex = columnLetter.charCodeAt(0) - 'A'.charCodeAt(0);
+
+        const secondIndex = this.getReversedIndex((parseInt(rowString)) - 1)
+
+        console.log(firstIndex);
+
+        console.log(secondIndex);
+
+        this.updateLastBestMoveCoords(firstIndex, secondIndex);
+      }
+      else {
+        console.log("MIMO");
+      }
+
+    },
   },
-  },
-  
+
 });

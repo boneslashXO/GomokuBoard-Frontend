@@ -2,7 +2,9 @@
 
 import { defineEmits } from 'vue';
 
-const emit = defineEmits(['startEngine', 'playMove', 'stopEngine']);
+//Component which has simple controls for controlling the state of the board
+
+const emit = defineEmits(['startEngine', 'playMove', 'stopEngine', 'changeEval']);
 
 function handleStartEngine() {
     emit('startEngine');
@@ -16,30 +18,23 @@ function handleStopEngine() {
     emit('stopEngine');
 }
 
+function changeEval()
+{
+    emit('changeEval')
+}
+
 </script>
 
 <template>
     <div class="game-controls">
-
         <button class="button" @click="handleStartEngine">Analyzing mode</button>
         <button class="button" @click="handlePlayMove">Play something</button>
         <button class="button" @click="handleStopEngine">Stop</button>
+        <button class="button" @click="changeEval">Change eval</button>
     </div>
 </template>
 
 <style scoped>
-
-.game-controls {
-    margin-top:-75px;
-    padding-right:75px;
-    display: flex;
-    flex-direction: row;
-    /* Align items in a row */
-    justify-content: center;
-    /* Center items horizontally */
-    gap: 10px;
-    /* Add some space between the buttons */
-}
 
 .button {
     background-color: black;
