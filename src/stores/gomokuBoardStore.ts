@@ -122,9 +122,7 @@ export const useGomokuBoardStore = defineStore("board", {
       //Regexes definition to match the desired output
       const coordinatesMatch = lastValue?.match(/\b([A-O])([0-9]|1[0-4])\b/);
 
-      const evalRegex = /Eval (\+?-?M?\d*)/;
-
-      const evalMatch = output.match(evalRegex);
+      const evalMatch = output.match(/Eval (\+?-?M?\d*)/);
 
       if (coordinatesMatch || evalMatch) {
 
