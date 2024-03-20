@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { ICellBoardProps } from "../components/definitions";
 
+type LastBestMoveCoords = undefined | { row: number; column: number };
+
 // This store is managing the entire state of the Gomoku board
 export const useGomokuBoardStore = defineStore("board", {
   state: () => ({
@@ -9,15 +11,20 @@ export const useGomokuBoardStore = defineStore("board", {
     boardSize: 0,
     cellSize: 0,
     numberOfMoves: 0,
+    evaluationScore: 50,
+    lastBestMoveCoords: undefined as LastBestMoveCoords,
   }),
   getters: {
     getCellByLastMove(state) {
       return state.gomokuBoard.find((x) => x.number == state.numberOfMoves);
     },
-    getCurrentPositionForAnalysis(state)
-    {
-      return state.gomokuBoard.filter(x=> x.number != undefined).sort((a , b) => a.number! - b.number!);
+    getCurrentPositionForAnalysis(state) {
+      return state.gomokuBoard.filter(x => x.number != undefined).sort((a, b) => a.number! - b.number!);
     },
+    lastBestMove(state) {
+      // Return the last best move coordinates
+      return state.lastBestMoveCoords;
+    }
   },
   actions: {
     initializeBoard(boardSize: number, totalSizeInPixels: number) {
@@ -39,9 +46,12 @@ export const useGomokuBoardStore = defineStore("board", {
           cell.column === coordinations.y && cell.row === coordinations.x
       );
     },
-    getReversedColumn(columnIndex: number) {
-    return (this.boardSize - 1) - columnIndex;
-   },
+    updateEvaluationScore(newScore: number) {
+      this.evaluationScore = newScore;
+    },
+    getReversedIndex(index: number) {
+      return (this.boardSize - 1) - index;
+    },
     addMoveNumber(coordinations: { x: number; y: number } | undefined) {
       if (coordinations) {
         const cell = this.getCellByRowAndColumn(coordinations);
@@ -52,6 +62,13 @@ export const useGomokuBoardStore = defineStore("board", {
         }
       }
     },
+    updateLastBestMoveCoords(row: number, column: number) {
+      this.lastBestMoveCoords = { row, column };
+    },
+    resetLastBestMoveCoords()
+    {
+      this.lastBestMoveCoords = undefined;
+    },
     deleteLastMove() {
       const cell = this.getCellByLastMove;
       if (cell) {
@@ -59,11 +76,70 @@ export const useGomokuBoardStore = defineStore("board", {
         this.numberOfMoves--;
       }
     },
-    updateBoardBasedOnEngineOutput(output: string) {
-    // Logic to update the board based on the engine's output
-      console.log("Updating board based on engine output:", output);
-    // Update state as necessary
+    stopCurrentAnalysis() {
+      if (this.lastBestMove) {
+        this.addMoveNumber({ x: this.lastBestMove.row, y: this.lastBestMove.column })
+        this.resetLastBestMoveCoords();
+      }
+    },
+    normalizeEvalValue(evalValue: string) {
+      // Directly return for "+M" and "-M" cases, else parse and normalize
+      const normalizedValue = evalValue.includes("+M") ? 100 :
+        evalValue.includes("-M") ? 0 :
+          (() => {
+            let numericValue = parseInt(evalValue, 10);
+            numericValue = Math.max(-700, Math.min(700, numericValue)); // Ensure within range
+            return ((numericValue + 700) / 1400) * 100; // Normalize to 0-100 scale
+          })();
+
+      // Reverse the score for white's move
+      return this.numberOfMoves % 2 !== 0 ? 100 - normalizedValue : normalizedValue;
+    },
+    // Processes a match from the evaluation regex
+    processEvaluationMatch(evaluationMatch : RegExpMatchArray)
+    {
+      const evalValue = this.normalizeEvalValue(evaluationMatch[1]);
+      console.log(evalValue);
+      this.updateEvaluationScore(evalValue);
+    },
+    // Processes a match from the coordinates regex
+    processBestMoveMatch(coordinatesMatch : RegExpMatchArray)
+    {
+      // Convert the column letter ('A'-'O') to a numeric index (0-14)
+      const firstIndex = coordinatesMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+      // Convert the row number to the correct index and reverse it according to game logic
+      const secondIndex = this.getReversedIndex((parseInt(coordinatesMatch[2])) - 1)
+
+      this.updateLastBestMoveCoords(firstIndex, secondIndex);
+    },
+   
+    updateBoardBasedOnEngineAnalysis(output: string) {
+
+      const outputSplitted = output.split(" | ");
+
+      const lastValue = outputSplitted.pop();
+
+      //Regexes definition to match the desired output
+      const coordinatesMatch = lastValue?.match(/\b([A-O])([0-9]|1[0-4])\b/);
+
+      const evalRegex = /Eval (\+?-?M?\d*)/;
+
+      const evalMatch = output.match(evalRegex);
+
+      if (coordinatesMatch || evalMatch) {
+
+        if(coordinatesMatch)
+        {
+          this.processBestMoveMatch(coordinatesMatch);
+        }
+
+        if(evalMatch)
+        {
+          this.processEvaluationMatch(evalMatch);
+        }
+
+      }
+    },
   },
-  },
-  
+
 });

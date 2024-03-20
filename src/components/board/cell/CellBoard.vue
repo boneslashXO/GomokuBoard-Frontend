@@ -23,27 +23,22 @@ const isBorderVisible = (borderStyle: BORDER_STYLE) => {
 const stoneSize = computed(() => props.size / 2.25);
 
 const textFontSize = computed(() => stoneSize.value / 1.25);
+
+const isLastBestMove = computed(() => {
+  return props.row === gomokuBoardStore?.lastBestMoveCoords?.row &&
+    props.column === gomokuBoardStore?.lastBestMoveCoords?.column;
+});
+
 </script>
 
 <!-- CellBoard is composed by borders around itself (depending which index) and stone (if number is availiable) -->
 <template>
-  <g
-    pointer-events="none"
-    :transform="`translate(${props.row * props.size},${props.column * props.size})`"
-  >
+  <g pointer-events="none" :transform="`translate(${props.row * props.size},${props.column * props.size})`">
     <g v-for="(borderStyle, index) in borderStyles" :key="index">
-      <CellBorder
-        v-if="isBorderVisible(borderStyle)"
-        :size="props.size"
-        :border-style="borderStyle"
-      />
+      <CellBorder v-if="isBorderVisible(borderStyle)" :size="props.size" :border-style="borderStyle" />
     </g>
-    <CellStone
-      v-if="props.number"
-      :size="stoneSize"
-      :text-font-size="textFontSize"
-      :number="props.number"
-    />
+    <circle v-if="isLastBestMove" :cx="0" :cy="0" :r="props.size / 8" fill="red" />
+    <CellStone v-if="props.number" :size="stoneSize" :text-font-size="textFontSize" :number="props.number" />
   </g>
 </template>
 

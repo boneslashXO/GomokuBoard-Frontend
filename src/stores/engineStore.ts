@@ -6,7 +6,7 @@ import { COMMAND_TYPE, IEngineOutput } from '../components/definitions';
 
 export const useEngineStore = defineStore('engineStore', {
   state: () => ({
-    engineOutput: ref(''), // For demonstration, might hold last message or be used differently
+    //engineOutput: ref(''), // For demonstration, might hold last message or be used differently
     isEngineOnline: ref<boolean>(false),
     socket: ref<Socket | null>(null), // Use ref to make socket reactive
     channel: ref<Channel | null>(null), // Use ref to make channel reactive
@@ -50,12 +50,12 @@ export const useEngineStore = defineStore('engineStore', {
      else if(response.commandType == COMMAND_TYPE.analyse)
      {
        // Directly use `gomokuBoardStore` to update UI based on engine output
-       useGomokuBoardStore().updateBoardBasedOnEngineOutput(response.output); 
+       useGomokuBoardStore().updateBoardBasedOnEngineAnalysis(response.output); 
      }
 
      else if(response.commandType == COMMAND_TYPE.stop)
      {
-       console.log(response.output);
+       useGomokuBoardStore().stopCurrentAnalysis();
      }
 
     },
