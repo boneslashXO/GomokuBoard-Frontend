@@ -45,9 +45,12 @@ function addStone(event: MouseEvent) {
 
 //removes lastly placed stone
 function removeLastStone(event: MouseEvent) {
-  gomokuBoardStore.deleteLastMove();
-  event.stopPropagation();
-  event.preventDefault();
+  if(!gomokuBoardStore.lastBestMove)
+  {
+    gomokuBoardStore.deleteLastMove();
+    event.stopPropagation();
+    event.preventDefault();
+  }
 }
 
 //analysation of the position with engine
