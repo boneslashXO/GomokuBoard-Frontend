@@ -25,8 +25,8 @@ const stoneSize = computed(() => props.size / 2.25);
 const textFontSize = computed(() => stoneSize.value / 1.25);
 
 const isLastBestMove = computed(() => {
-  return props.row === gomokuBoardStore.lastBestMoveCoords.row &&
-    props.column === gomokuBoardStore.lastBestMoveCoords.column;
+  return props.row === gomokuBoardStore?.lastBestMoveCoords?.row &&
+    props.column === gomokuBoardStore?.lastBestMoveCoords?.column;
 });
 
 </script>

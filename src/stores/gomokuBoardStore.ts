@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { ICellBoardProps } from "../components/definitions";
 
+type LastBestMoveCoords = undefined | { row: number; column: number };
+
 // This store is managing the entire state of the Gomoku board
 export const useGomokuBoardStore = defineStore("board", {
   state: () => ({
@@ -9,7 +11,8 @@ export const useGomokuBoardStore = defineStore("board", {
     boardSize: 0,
     cellSize: 0,
     numberOfMoves: 0,
-    lastBestMoveCoords: { row: -1, column: -1 },
+    evaluationScore: 50,
+    lastBestMoveCoords: undefined as LastBestMoveCoords,
   }),
   getters: {
     getCellByLastMove(state) {
@@ -43,6 +46,9 @@ export const useGomokuBoardStore = defineStore("board", {
           cell.column === coordinations.y && cell.row === coordinations.x
       );
     },
+    updateEvaluationScore(newScore: number) {
+      this.evaluationScore = newScore;
+    },
     getReversedIndex(index: number) {
       return (this.boardSize - 1) - index;
     },
@@ -59,6 +65,10 @@ export const useGomokuBoardStore = defineStore("board", {
     updateLastBestMoveCoords(row: number, column: number) {
       this.lastBestMoveCoords = { row, column };
     },
+    resetLastBestMoveCoords()
+    {
+      this.lastBestMoveCoords = undefined;
+    },
     deleteLastMove() {
       const cell = this.getCellByLastMove;
       if (cell) {
@@ -66,38 +76,69 @@ export const useGomokuBoardStore = defineStore("board", {
         this.numberOfMoves--;
       }
     },
-    playCurrentlyBestMove() {
-      if (this.lastBestMove.column != -1 && this.lastBestMove.row != -1) {
+    stopCurrentAnalysis() {
+      if (this.lastBestMove) {
         this.addMoveNumber({ x: this.lastBestMove.row, y: this.lastBestMove.column })
-        this.updateLastBestMoveCoords(-1, -1);
+        this.resetLastBestMoveCoords();
       }
     },
-    updateBoardBasedOnEngineOutput(output: string) {
+    normalizeEvalValue(evalValue: string) {
+      // Directly return for "+M" and "-M" cases, else parse and normalize
+      const normalizedValue = evalValue.includes("+M") ? 100 :
+        evalValue.includes("-M") ? 0 :
+          (() => {
+            let numericValue = parseInt(evalValue, 10);
+            numericValue = Math.max(-700, Math.min(700, numericValue)); // Ensure within range
+            return ((numericValue + 700) / 1400) * 100; // Normalize to 0-100 scale
+          })();
 
-      const outputSplitted = output.split("|");
+      // Reverse the score for white's move
+      return this.numberOfMoves % 2 !== 0 ? 100 - normalizedValue : normalizedValue;
+    },
+    // Processes a match from the evaluation regex
+    processEvaluationMatch(evaluationMatch : RegExpMatchArray)
+    {
+      const evalValue = this.normalizeEvalValue(evaluationMatch[1]);
+      console.log(evalValue);
+      this.updateEvaluationScore(evalValue);
+    },
+    // Processes a match from the coordinates regex
+    processBestMoveMatch(coordinatesMatch : RegExpMatchArray)
+    {
+      // Convert the column letter ('A'-'O') to a numeric index (0-14)
+      const firstIndex = coordinatesMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+      // Convert the row number to the correct index and reverse it according to game logic
+      const secondIndex = this.getReversedIndex((parseInt(coordinatesMatch[2])) - 1)
 
-      const lastValue = outputSplitted[outputSplitted.length - 1];
+      this.updateLastBestMoveCoords(firstIndex, secondIndex);
+    },
+   
+    updateBoardBasedOnEngineAnalysis(output: string) {
 
-      const firstCoordinateMatch = lastValue.match(/\b([A-O])([0-9]|1[0-4])\b/);
+      const outputSplitted = output.split(" | ");
 
-      if (firstCoordinateMatch) {
-        const [_fullMatch, columnLetter, rowString] = firstCoordinateMatch;
+      const lastValue = outputSplitted.pop();
 
-        // Convert the column from 'A'-'O' to 0-14
-        const firstIndex = columnLetter.charCodeAt(0) - 'A'.charCodeAt(0);
+      //Regexes definition to match the desired output
+      const coordinatesMatch = lastValue?.match(/\b([A-O])([0-9]|1[0-4])\b/);
 
-        const secondIndex = this.getReversedIndex((parseInt(rowString)) - 1)
+      const evalRegex = /Eval (\+?-?M?\d*)/;
 
-        console.log(firstIndex);
+      const evalMatch = output.match(evalRegex);
 
-        console.log(secondIndex);
+      if (coordinatesMatch || evalMatch) {
 
-        this.updateLastBestMoveCoords(firstIndex, secondIndex);
+        if(coordinatesMatch)
+        {
+          this.processBestMoveMatch(coordinatesMatch);
+        }
+
+        if(evalMatch)
+        {
+          this.processEvaluationMatch(evalMatch);
+        }
+
       }
-      else {
-        console.log("MIMO");
-      }
-
     },
   },
 

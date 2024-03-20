@@ -2,21 +2,19 @@
 import { computed } from 'vue';
 import { defineProps } from 'vue';
 
-// Define the props the component accepts
 const props = defineProps({
     height: Number,
     value: Number
 });
 
-// Example computed property to determine some aspect of the evaluation bar,
-// like the filled portion's height, based on the value prop.
+//filled portion's height, based on the value prop.
 const filledHeight = computed(() => `${Math.max(0, Math.min(100, props.value))}%`);
 </script>
 
 
 <template>
     <div class="evaluation-bar" :style="{ height: props.height - 50 + 'px' }">
-        <div class="score-bar-background" :style="{ height: props.height -50 + 'px' }">
+        <div class="score-bar-background" :style="{ height: props.height  - 50 + 'px' }">
             <div class="score-bar-fill" :style="{ height: filledHeight }"></div>
         </div>
     </div>

@@ -36,8 +36,11 @@ function getThePositionOfTheMouse(event: MouseEvent) {
 
 //adding a the stone to boad
 function addStone(event: MouseEvent) {
-  const coordinations = getThePositionOfTheMouse(event);
-  gomokuBoardStore.addMoveNumber(coordinations);
+  if(!gomokuBoardStore.lastBestMove)
+  {
+    const coordinations = getThePositionOfTheMouse(event);
+    gomokuBoardStore.addMoveNumber(coordinations);
+  }
 }
 
 //removes lastly placed stone
@@ -89,14 +92,15 @@ function analyseCurrentPosition() {
       </svg>
 
       <EvaluationBar class="evaluation-bar" :height="gomokuBoardStore.totalSizeInPixels"
-        :value="engineStore.evaluationScore" />
+        :value="gomokuBoardStore.evaluationScore" />
 
     </div>
 
     <GameControls class="gameControls"
       @start-engine="engineStore.sendMessage(COMMAND_TYPE.start, `info rule 1 START 15\n`)"
-      @play-move="analyseCurrentPosition" @stop-engine="engineStore.sendMessage(COMMAND_TYPE.stop, `YXSTOP\n`)"
-      @change-eval="engineStore.updateEvaluationScore(engineStore.evaluationScore+30)" />
+      @play-move="analyseCurrentPosition" 
+      @stop-engine="engineStore.sendMessage(COMMAND_TYPE.stop, `YXSTOP\n`)"
+      @change-eval="gomokuBoardStore.updateEvaluationScore(gomokuBoardStore.evaluationScore+30)" />
 
   </div>
 

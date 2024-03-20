@@ -8,7 +8,6 @@ export const useEngineStore = defineStore('engineStore', {
   state: () => ({
     //engineOutput: ref(''), // For demonstration, might hold last message or be used differently
     isEngineOnline: ref<boolean>(false),
-    evaluationScore: 10,
     socket: ref<Socket | null>(null), // Use ref to make socket reactive
     channel: ref<Channel | null>(null), // Use ref to make channel reactive
     // Other state properties as needed
@@ -51,18 +50,15 @@ export const useEngineStore = defineStore('engineStore', {
      else if(response.commandType == COMMAND_TYPE.analyse)
      {
        // Directly use `gomokuBoardStore` to update UI based on engine output
-       useGomokuBoardStore().updateBoardBasedOnEngineOutput(response.output); 
+       useGomokuBoardStore().updateBoardBasedOnEngineAnalysis(response.output); 
      }
 
      else if(response.commandType == COMMAND_TYPE.stop)
      {
-       useGomokuBoardStore().playCurrentlyBestMove();
+       useGomokuBoardStore().stopCurrentAnalysis();
      }
 
     },
-    updateEvaluationScore(newScore : number) {
-    this.evaluationScore = newScore;
-  },
      disconnect() {
       if (this.channel) {
         this.channel.leave(); // Leave the channel
