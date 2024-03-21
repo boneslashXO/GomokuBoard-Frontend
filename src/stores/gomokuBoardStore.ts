@@ -65,8 +65,7 @@ export const useGomokuBoardStore = defineStore("board", {
     updateLastBestMoveCoords(row: number, column: number) {
       this.lastBestMoveCoords = { row, column };
     },
-    resetLastBestMoveCoords()
-    {
+    resetLastBestMoveCoords() {
       this.lastBestMoveCoords = undefined;
     },
     deleteLastMove() {
@@ -96,15 +95,13 @@ export const useGomokuBoardStore = defineStore("board", {
       return this.numberOfMoves % 2 !== 0 ? 100 - normalizedValue : normalizedValue;
     },
     // Processes a match from the evaluation regex
-    processEvaluationMatch(evaluationMatch : RegExpMatchArray)
-    {
+    processEvaluationMatch(evaluationMatch: RegExpMatchArray) {
       const evalValue = this.normalizeEvalValue(evaluationMatch[1]);
       console.log(evalValue);
       this.updateEvaluationScore(evalValue);
     },
     // Processes a match from the coordinates regex
-    processBestMoveMatch(coordinatesMatch : RegExpMatchArray)
-    {
+    processBestMoveMatch(coordinatesMatch: RegExpMatchArray) {
       // Convert the column letter ('A'-'O') to a numeric index (0-14)
       const firstIndex = coordinatesMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
       // Convert the row number to the correct index and reverse it according to game logic
@@ -112,7 +109,7 @@ export const useGomokuBoardStore = defineStore("board", {
 
       this.updateLastBestMoveCoords(firstIndex, secondIndex);
     },
-   
+
     updateBoardBasedOnEngineAnalysis(output: string) {
 
       const outputSplitted = output.split(" | ");
@@ -126,13 +123,11 @@ export const useGomokuBoardStore = defineStore("board", {
 
       if (coordinatesMatch || evalMatch) {
 
-        if(coordinatesMatch)
-        {
+        if (coordinatesMatch) {
           this.processBestMoveMatch(coordinatesMatch);
         }
 
-        if(evalMatch)
-        {
+        if (evalMatch) {
           this.processEvaluationMatch(evalMatch);
         }
 
