@@ -1,13 +1,26 @@
 <script setup lang="ts">
 
-import { defineEmits } from 'vue';
-
+import { defineEmits, computed } from 'vue';
+import { useEngineStore } from '../../stores/engineStore';
+import { useGomokuBoardStore } from '../../stores/gomokuBoardStore';
 //Component which has simple controls for controlling the state of the board
 
 const emit = defineEmits(['startEngine', 'playMove', 'stopEngine', 'changeEval']);
 
+const analysisText = computed(() => useEngineStore().isEngineOnline ? "Analysis ON" : "Analysis OFF");
+const analyseMoveText = computed(() => useGomokuBoardStore().lastBestMove == undefined ? "Analyse best move" : "Stop analysis");
+
+
 function handleStartEngine() {
-    emit('startEngine');
+    if(!useEngineStore().isEngineOnline)
+    {
+        emit('startEngine');
+    }
+    
+}
+
+function handleMove() {
+    !useGomokuBoardStore().lastBestMove ? handlePlayMove() : handleStopEngine();
 }
 
 function handlePlayMove() {
@@ -18,29 +31,22 @@ function handleStopEngine() {
     emit('stopEngine');
 }
 
-function changeEval()
-{
-    emit('changeEval')
-}
-
 </script>
 
 <template>
     <div class="game-controls">
-        <button class="button" @click="handleStartEngine">Analyzing mode</button>
-        <button class="button" @click="handlePlayMove">Play something</button>
-        <button class="button" @click="handleStopEngine">Stop</button>
-        <button class="button" @click="changeEval">Change eval</button>
+        <button class="button" @click="handleStartEngine">{{ analysisText }}</button>
+        <button class="button" style="min-width:200px;max-width: 200px;" @click="handleMove">{{
+            analyseMoveText }}</button>
     </div>
 </template>
 
 <style scoped>
-
 .button {
-    background-color: black;
+    background-color: white;
     /* Green */
     border: none;
-    color: white;
+    color: black;
     padding: 15px 32px;
     text-align: center;
     text-decoration: none;
