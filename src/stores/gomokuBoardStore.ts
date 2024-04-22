@@ -132,6 +132,11 @@ export const useGomokuBoardStore = defineStore("board", {
         }
 
       }
+      ///If everything fails, stop the engine
+      else
+      {
+        this.stopCurrentAnalysis();
+      }
     },
   },
 

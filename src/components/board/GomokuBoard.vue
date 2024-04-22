@@ -36,17 +36,16 @@ function getThePositionOfTheMouse(event: MouseEvent) {
 
 //adding a the stone to boad
 function addStone(event: MouseEvent) {
-  if(!gomokuBoardStore.lastBestMove)
-  {
+  if (!gomokuBoardStore.lastBestMove) {
     const coordinations = getThePositionOfTheMouse(event);
     gomokuBoardStore.addMoveNumber(coordinations);
   }
+
 }
 
 //removes lastly placed stone
-function removeLastStone(event: MouseEvent) {
-  if(!gomokuBoardStore.lastBestMove)
-  {
+function removeStone(event: MouseEvent) {
+  if (!gomokuBoardStore.lastBestMove) {
     gomokuBoardStore.deleteLastMove();
     event.stopPropagation();
     event.preventDefault();
@@ -55,7 +54,7 @@ function removeLastStone(event: MouseEvent) {
 
 //analysation of the position with engine
 function analyseCurrentPosition() {
-  if (engineStore.isEngineOnline) {
+  if (engineStore.isEngineOnline && gomokuBoardStore.numberOfMoves >= 3) {
     let formattedMoves: string[] = [];
 
     const boardPosition = gomokuBoardStore.getCurrentPositionForAnalysis;
@@ -85,7 +84,8 @@ function analyseCurrentPosition() {
     <div class="board-and-evaluation">
 
       <svg :width="gomokuBoardStore.totalSizeInPixels" :height="gomokuBoardStore.totalSizeInPixels" overflow="visible"
-        @mousedown.left="(ev) => addStone(ev)" @contextmenu="(ev) => removeLastStone(ev)">
+        @mousedown.left="(ev: MouseEvent) => addStone(ev)"
+        @contextmenu="(ev: MouseEvent) => removeStone(ev)">
         <rect :x="-gomokuBoardStore.cellSize / 2" :y="-gomokuBoardStore.cellSize / 2"
           :width="gomokuBoardStore.totalSizeInPixels - gomokuBoardStore.cellSize"
           :height="gomokuBoardStore.totalSizeInPixels - gomokuBoardStore.cellSize" fill="grey" pointer-events="none" />
@@ -101,9 +101,7 @@ function analyseCurrentPosition() {
 
     <GameControls class="gameControls"
       @start-engine="engineStore.sendMessage(COMMAND_TYPE.start, `info rule 1 START 15\n`)"
-      @play-move="analyseCurrentPosition" 
-      @stop-engine="engineStore.sendMessage(COMMAND_TYPE.stop, `YXSTOP\n`)"
-      @change-eval="gomokuBoardStore.updateEvaluationScore(gomokuBoardStore.evaluationScore+30)" />
+      @play-move="analyseCurrentPosition" @stop-engine="engineStore.sendMessage(COMMAND_TYPE.stop, `YXSTOP\n`)" />
 
   </div>
 
@@ -137,6 +135,4 @@ function analyseCurrentPosition() {
   gap: 10px;
   /* Add some space between the buttons */
 }
-
-
 </style>
