@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineProps } from "vue";
+import { computed } from "vue";
 import { BORDER_STYLE, IBorderProps } from "../../definitions";
 
 const props = defineProps<IBorderProps>();
