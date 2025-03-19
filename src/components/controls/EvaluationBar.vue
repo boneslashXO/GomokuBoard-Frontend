@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from 'vue';
-import { defineProps } from 'vue';
 
 const props = defineProps({
     height: Number,
@@ -22,7 +21,7 @@ const filledHeight = computed(() => `${Math.max(0, Math.min(100, props.value))}%
 
 <style scoped>
 .evaluation-bar {
-    margin-top: -25px;
+    margin-top: -35px;
     margin-left:-45px;
     display: flex;
     flex-direction: column;

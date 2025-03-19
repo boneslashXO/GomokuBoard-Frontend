@@ -39,3 +39,10 @@ export interface IEngineOutput {
   output : string;
   commandType: COMMAND_TYPE
 }
+
+export interface IDecoratorsProps {
+  column : number;
+  row : number;
+  size: number;
+  isLastBestMove: boolean
+}

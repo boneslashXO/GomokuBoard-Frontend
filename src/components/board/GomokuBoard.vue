@@ -81,21 +81,20 @@ function analyseCurrentPosition() {
 <template>
 
   <div class="game-container">
+
     <div class="board-and-evaluation">
 
       <svg :width="gomokuBoardStore.totalSizeInPixels" :height="gomokuBoardStore.totalSizeInPixels" overflow="visible"
-        @mousedown.left="(ev: MouseEvent) => addStone(ev)"
-        @contextmenu="(ev: MouseEvent) => removeStone(ev)">
-        <rect :x="-gomokuBoardStore.cellSize / 2" :y="-gomokuBoardStore.cellSize / 2"
-          :width="gomokuBoardStore.totalSizeInPixels - gomokuBoardStore.cellSize"
-          :height="gomokuBoardStore.totalSizeInPixels - gomokuBoardStore.cellSize" fill="grey" pointer-events="none" />
+        @mousedown.left="(ev: MouseEvent) => addStone(ev)" @contextmenu="(ev: MouseEvent) => removeStone(ev)">
+        <rect :x="-gomokuBoardStore.cellSize / 2-5" :y="-gomokuBoardStore.cellSize / 2-5"
+          :width="gomokuBoardStore.totalSizeInPixels - gomokuBoardStore.cellSize+10"
+          :height="gomokuBoardStore.totalSizeInPixels - gomokuBoardStore.cellSize+10" fill="grey" pointer-events="none" />
 
         <CellBoard v-for="(cellBoard, index) in gomokuBoard" :key="index" :row="cellBoard.row"
           :column="cellBoard.column" :size="cellBoard.size" :number="cellBoard.number"></CellBoard>
       </svg>
 
-      <EvaluationBar class="evaluation-bar" :height="gomokuBoardStore.totalSizeInPixels"
-        :value="gomokuBoardStore.evaluationScore" />
+      <EvaluationBar :height="gomokuBoardStore.totalSizeInPixels+10" :value="gomokuBoardStore.evaluationScore" />
 
     </div>
 

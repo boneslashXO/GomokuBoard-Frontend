@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { defineEmits, computed } from 'vue';
+import { computed } from 'vue';
 import { useEngineStore } from '../../stores/engineStore';
 import { useGomokuBoardStore } from '../../stores/gomokuBoardStore';
 //Component which has simple controls for controlling the state of the board

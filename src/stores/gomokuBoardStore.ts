@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ICellBoardProps } from "../components/definitions";
 
-type LastBestMoveCoords = undefined | { row: number; column: number };
+type LastBestMoveCoords = undefined | { column: number; row: number; };
 
 // This store is managing the entire state of the Gomoku board
 export const useGomokuBoardStore = defineStore("board", {
@@ -33,9 +33,9 @@ export const useGomokuBoardStore = defineStore("board", {
       this.cellSize = totalSizeInPixels / 16;
       this.gomokuBoard = [];
       // Initialize the board with the specified size and cell size
-      for (let row = 0; row < this.boardSize; row++) {
-        for (let column = 0; column < this.boardSize; column++) {
-          const item: ICellBoardProps = { row, column, size: this.cellSize };
+      for (let column = 0; column < this.boardSize; column++) {
+        for (let row = 0; row < this.boardSize; row++) {
+          const item: ICellBoardProps = { column, row, size: this.cellSize };
           this.gomokuBoard.push(item);
         }
       }
@@ -43,7 +43,7 @@ export const useGomokuBoardStore = defineStore("board", {
     getCellByRowAndColumn(coordinations: { x: number; y: number }) {
       return this.gomokuBoard.find(
         (cell) =>
-          cell.column === coordinations.y && cell.row === coordinations.x
+          cell.row === coordinations.y && cell.column === coordinations.x
       );
     },
     updateEvaluationScore(newScore: number) {
@@ -63,7 +63,7 @@ export const useGomokuBoardStore = defineStore("board", {
       }
     },
     updateLastBestMoveCoords(row: number, column: number) {
-      this.lastBestMoveCoords = { row, column };
+      this.lastBestMoveCoords = { row: row, column: column };
     },
     resetLastBestMoveCoords() {
       this.lastBestMoveCoords = undefined;
@@ -77,7 +77,7 @@ export const useGomokuBoardStore = defineStore("board", {
     },
     stopCurrentAnalysis() {
       if (this.lastBestMove) {
-        this.addMoveNumber({ x: this.lastBestMove.row, y: this.lastBestMove.column })
+        this.addMoveNumber({ x: this.lastBestMove.column, y: this.lastBestMove.row })
         this.resetLastBestMoveCoords();
       }
     },
